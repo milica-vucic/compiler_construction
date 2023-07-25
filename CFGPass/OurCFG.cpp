@@ -15,7 +15,7 @@ void OurCFG::CreateCFG(Function &F)
         AdjacencyList[&BB] = {};
         // successors - funkcija koja nam vraca sve BasicBlock-ove u koje mozemo skociti iz trenutnog BasicBlock-a
         // uz koriscenje br instrukcije
-        for (BasicBlock* Successors = successors(&BB))
+        for (BasicBlock* Successor : successors(&BB))
             AddEdge(&BB, Successor);
     }
 }
@@ -41,7 +41,7 @@ void OurCFG::DumpBasicBlock(BasicBlock* BB, raw_fd_stream &File, bool only)
     bool MultipleSuccessors = false;
 
     File << "\tNode" << BB << " [shape=record, color=\"#b70d28ff\", style=filled, fillcolor=\"#b70d2870\", label=\"{";
-    BB->printAsOperand();
+    BB->printAsOperand(File, false);
 
     if (only) {
         File << "\\l ";
@@ -50,7 +50,7 @@ void OurCFG::DumpBasicBlock(BasicBlock* BB, raw_fd_stream &File, bool only)
         // IF ili SWITCH naredbu. Ukoliko sadrzi, znamo da postoji vise successora i neophodno je adekvatno ih zapisati u .dot fajlu, 
         // a ukoliko ne, zapisujemo instrukciju standardno.
 
-        for (Instruction *Instr : &BB) {
+        for (Instruction &Instr : *BB) {
             // Provera da li je u pitanju br instrukcija
             if (BranchInst *BranchInstruction = dyn_cast<BranchInst>(&Instr)) {
                 // Provera da li je ova instrukcija IF
@@ -72,7 +72,7 @@ void OurCFG::DumpBasicBlock(BasicBlock* BB, raw_fd_stream &File, bool only)
 
                 // Dalje prolazimo kroz svaki case i ispisujemo redni broj, a zatim i vrednost
                 for (auto Case : SwitchInstruction->cases()) {
-                    File << "|<s" << (Case->getCaseIndex() + 1) << ">";
+                    File << "|<s" << (Case.getCaseIndex() + 1) << ">";
 
                     // Ispisujemo kao operand jer zelimo da izvucemo samo vrednost, a ne i tip podataka uz nju
                     // U IR-u, switch ima narednu formu
