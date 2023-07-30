@@ -1,0 +1,3 @@
+/home/milica/Desktop/llvm-project/llvm/lib/Transforms/Dominators/build/CMakeFiles/Dominators.dir
+/home/milica/Desktop/llvm-project/llvm/lib/Transforms/Dominators/build/CMakeFiles/edit_cache.dir
+/home/milica/Desktop/llvm-project/llvm/lib/Transforms/Dominators/build/CMakeFiles/rebuild_cache.dir

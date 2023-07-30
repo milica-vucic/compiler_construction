@@ -48,7 +48,7 @@ void OurCallGraph::dumpGraphToFile()
     std::ofstream File;
     File.open(ModuleName + ".dot");
 
-    File << "digraph  \"Call graph: " + ModuleName << "\" {\n";
+    File << "digraph \"Call graph: " << ModuleName << "\" {\n";
     File << "\tlabel=\"Call graph: " << ModuleName << "\";\n";
 
     // Svaki cvor zapisan je u narednom formatu:
@@ -56,7 +56,7 @@ void OurCallGraph::dumpGraphToFile()
 
     // Prolazimo kroz elemente liste povezanosti
     for (auto &kvp : AdjacencyList) {
-        File << "\tNode" << kvp.first << " [shape=record, label=\"{" <<
+        File << "\tNode" << kvp.first << " [shape=record, color=\"#12535c\", style=filled, fillcolor=\"#21828f\", label=\"{" <<
                 kvp.first->getName().str() << "}\"];\n";
 
         // Kada postoji grana izmedju dva cvora u grafu, reprezentuje se na sledeci nacin:
