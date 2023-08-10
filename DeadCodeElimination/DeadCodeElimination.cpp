@@ -27,6 +27,13 @@ struct DeadCodeEliminationPass : public FunctionPass {
     std::unordered_map<Value *, bool> Variables = {};
     std::unordered_set<Instruction *> InstructionsToRemove = {};
 
+    errs() << "======= ALL INSTRUCTIONS =======\n";
+    for (BasicBlock &BB : F) {
+      for (Instruction &Instr : BB)
+        errs() << Instr.getOpcodeName() << "\n";
+    }
+    errs() << "\n";
+
     for (BasicBlock &BB : F) {
       for (Instruction &Instr : BB) {
         if (Instr.getType() != Type::getVoidTy(Instr.getContext())) {
@@ -34,7 +41,7 @@ struct DeadCodeEliminationPass : public FunctionPass {
           if (!isa<CallInst>(&Instr))
             Variables[&Instr] = false;
         }
-        
+
         if (isa<LoadInst>(&Instr))
           VariablesMap[&Instr] = Instr.getOperand(0);
 
@@ -44,8 +51,11 @@ struct DeadCodeEliminationPass : public FunctionPass {
             Variables[VariablesMap[Instr.getOperand(0)]] = true;
           }
         } else {
+          // %4 = alloca i32, align 4
           int NumOfOperands = (int)Instr.getNumOperands();
           for (int i = 0; i < NumOfOperands; ++i) {
+            // ako operand vec postoji u mapi, onda ce biti koriscen
+            // gledamo i u sta je bio mapiran, pa i to oznacavamo kao nesto sto se koristi u kodu
             if (Variables.find(Instr.getOperand(i)) != Variables.end()) {
               Variables[Instr.getOperand(i)] = true;
               Variables[VariablesMap[Instr.getOperand(i)]] = true;
@@ -65,9 +75,10 @@ struct DeadCodeEliminationPass : public FunctionPass {
         }
       }
     }
-
+    errs() << "======= INSTRUCTIONS TO BE REMOVED =======\n";
     for (Instruction *Instr : InstructionsToRemove)
-      errs() << Instr->getOpcodeName() << "\n";
+      errs() << Instr->getOpcodeName() << " " << Instr->getNumOperands() << "\n";
+    errs() << "\n";
 
     if (!InstructionsToRemove.empty())
       EliminateInstruction = true;
