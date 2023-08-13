@@ -71,12 +71,20 @@ struct LoopUnrollingPass : public LoopPass {
 
     BasicBlock *NewBasicBlock = nullptr;
     Instruction *InstrCopy = nullptr;
+    
+    errs() << "Num of BB: " << LoopBasicBlocks.size() << "\n";
 
     // Kreiranje buildera sa nekim BB koji je validan
     IRBuilder<> Builder(MoveBefore);
     // Onoliki broj puta koliki bi se regularno petlja izvrsila
     for (int k = 0; k < NumOfTimes; ++k) {
       LoopBasicBlocksCopy.clear();
+      
+      errs() << "MoveBefore: ";
+      MoveBefore->printAsOperand(errs(), false);
+      errs() << ", LastFromPrevious: ";
+      LastFromPrevious->printAsOperand(errs(), false);
+      errs() << " -> ";
 
       // Prolazimo kroz sve BB koji su ulazili u sastav petlje
       // MoveBefore je inicijalno postavljen na ExitBlock, pa sve sto dodajemo dodajemo pre njega
@@ -124,7 +132,13 @@ struct LoopUnrollingPass : public LoopPass {
         }
       }
 
+      // %7 -> %9
+      // %9 -> %11 ...
+      // LoopBasicBlocksCopy sadrzi samo jedan BB u primeru pa je svejedno da li se uzima .front ili .back
+
       LastFromPrevious->getTerminator()->setSuccessor(0, LoopBasicBlocksCopy.front());
+      LoopBasicBlocksCopy.front()->printAsOperand(errs(), false);
+      errs() << "\n";
       LastFromPrevious = LoopBasicBlocksCopy.back();
     }
 
